@@ -231,5 +231,32 @@
     \end{figure}
 \end{frame}
 
+\begin{frame}{Mammoth Dataset}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\textwidth]{./images/mammoth3D.png}
+        \caption{3D Mammoth Dataset Visualization}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Laplacian Eigenmaps Embedding of Mammoth Dataset}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.7\textwidth]{./images/le_mammoth.png}
+        \caption{Laplacian Eigenmaps Embedding of the Mammoth Dataset}
+    \end{figure}
+    \begin{block}{Observation}
+        The effect shown on the picture is called the starfish effect. It reflects perfectly how the Laplacian Eigenmaps preserves connectivity, but it fails to preserve global structure.
+    \end{block}
+\end{frame}
+
+\begin{frame}{Laplacian Eigenmaps as UMAP initialization}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\textwidth]{./images/UMAP_comparison.png}
+        \caption{UMAP Embedding of the Mammoth Dataset with Laplacian Eigenmaps Initialization and Random Initialization}
+    \end{figure}
+\end{frame}
+
 \end{document}
 
