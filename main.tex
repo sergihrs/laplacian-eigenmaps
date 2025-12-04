@@ -1,0 +1,195 @@
+\documentclass[aspectratio=169]{beamer}
+ 
+% Configuración de idioma y codificación
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+ 
+% Selección de tema (Madrid es clásico y tiene pies de página informativos)
+\usetheme{Madrid}
+\usecolortheme{default} % Puedes cambiar 'beaver' por 'default', 'dolphin', etc.
+ 
+% Metadatos del documento
+\title[Proyecto 7: Laplacian Eigenmaps]{Proyecto 7: Laplacian Eigenmaps para reducción de dimensión y embeddings}
+\subtitle{Asignatura: Métodos Diferenciales para la IA}
+\author[Máster IA]{Sergio Herreros Pérez, Mario Kroll Merino, Carlos Mazuecos Reíllo, José Andrés Ridruejo Tuñón}
+\date{} % Dejar vacío o poner \today
+ 
+% Configuración para numeración de páginas (ej. 1/8)
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+ 
+\begin{document}
+ 
+% --- DIAPOSITIVA 1: PORTADA ---
+\begin{frame}
+    \titlepage
+\end{frame}
+ 
+% --- DIAPOSITIVA 2: OBJETIVOS ---
+\begin{frame}{Why Laplacian Eigenmaps?}
+    \begin{itemize}
+        \item Classical dimensionality reduction techniques (PCA, MDS) are \textbf{linear} and fail to capture non-linear structures.
+        \item Real datasets often lie near a \textbf{non-linear manifold} embedded in high dimensions.
+        \item \textbf{Laplacian Eigenmaps} aim to preserve the \textbf{local geometry} of the data.
+    \end{itemize}
+
+    \vspace{0.3cm}
+    \begin{block}{Key Idea}
+        Build a graph that captures local relationships and use the eigenvectors of the \textbf{graph Laplacian} to obtain a smooth low-dimensional embedding.
+    \end{block}
+\end{frame}
+
+
+\begin{frame}{Laplacian Eigenmaps: Core Idea}
+    \begin{enumerate}
+        \item Build a \textbf{neighborhood graph} using k-NN or a kernel.
+        \item Assign similarity weights $w_{ij}$ between connected points.
+        \item Construct the graph Laplacian: $L = D - A$.
+        \item Solve the spectral problem:
+        \[
+            Lf = \lambda f.
+        \]
+    \end{enumerate}
+
+    \vspace{0.3cm}
+    \begin{block}{Final Embedding}
+        The eigenvectors associated with the smallest non-zero eigenvalues provide the embedding coordinates.
+    \end{block}
+\end{frame}
+
+
+\begin{frame}{Geometric Interpretation}
+    \begin{itemize}
+        \item The graph Laplacian measures the \textbf{smoothness} of a function on the graph.
+        \item Minimizing $f^\top L f = \sum_{i,j} w_{ij}(f_i - f_j)^2$ encourages nearby nodes to have similar values.
+        \item The smallest-energy eigenvectors correspond to the "smoothest" functions on the graph.
+    \end{itemize}
+
+    \vspace{0.3cm}
+    \begin{alertblock}{Why this reduces dimension}
+        These smooth eigenfunctions capture the local geometric structure of the underlying manifold.
+    \end{alertblock}
+\end{frame}
+
+
+
+\begin{frame}{The Continuous Problem: Laplace–Beltrami}
+    \textbf{On a continuous domain or manifold:}
+    \[
+        \min_{u:\|u\|=1} \int_\Omega |\nabla u|^2 \, dx
+    \]
+    leads to the eigenvalue problem:
+    \[
+        -\Delta u = \lambda u.
+    \]
+
+    \begin{itemize}
+        \item The eigenvalues encode the \textbf{geometry} of the manifold.
+        \item The eigenfunctions are smooth modes with minimal oscillation.
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{From Continuous to Discrete: The Key Connection}
+    \begin{columns}[t]
+        \begin{column}{0.48\textwidth}
+            \textbf{Continuous Laplacian}
+            \[
+                -\Delta u = \lambda u
+            \]
+            \[
+                \int |\nabla u|^2
+            \]
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \textbf{Graph Laplacian}
+            \[
+                Lf = \lambda f
+            \]
+            \[
+                f^\top L f = \sum w_{ij}(f_i - f_j)^2
+            \]
+        \end{column}
+    \end{columns}
+
+    \vspace{0.4cm}
+    \begin{block}{Conceptual Correspondence}
+        \begin{itemize}
+            \item $|\nabla u|^2 \;\longleftrightarrow\; (f_i - f_j)^2$
+            \item Laplace–Beltrami operator $\longleftrightarrow$ Graph Laplacian
+            \item Smoothness on the manifold $\longleftrightarrow$ Smoothness on the graph
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+
+
+
+\begin{frame}{Laplacian Eigenmaps in Graph-Based Learning}
+    \begin{itemize}
+        \item Laplacian Eigenmaps provide the spectral foundation for many graph learning algorithms:
+        \begin{itemize}
+            \item \textbf{Spectral Clustering}: uses the smallest non-zero Laplacian eigenvectors to partition graphs.
+            \item \textbf{Graph Convolutional Networks (GCNs)}: graph convolutions are defined using the Laplacian spectrum.
+        \end{itemize}
+
+        \vspace{0.3cm}
+
+        \item The Laplacian encodes the local geometry of the dataset by capturing similarity relations through weights $w_{ij}$.
+        \item Eigenvectors provide smooth representations that respect this geometry.
+    \end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}{Connection to the Finite Element Method (FEM)}
+    \begin{block}{Shared Variational Principle}
+        Both FEM and Laplacian Eigenmaps are based on minimizing an energy associated with the Laplacian:
+        \[
+            \int_\Omega |\nabla u|^2 \quad \longleftrightarrow \quad
+            \sum_{i,j} w_{ij}(f_i - f_j)^2 = f^\top L f.
+        \]
+    \end{block}
+
+    \vspace{0.3cm}
+
+    \begin{itemize}
+        \item FEM approximates $\Delta$ on a mesh; Laplacian Eigenmaps approximate $\Delta$ on a \textbf{similarity graph}.
+        \item In both cases, low-energy eigenfunctions correspond to the smoothest modes.
+        \item This provides a rigorous bridge between PDE-based models and graph learning.
+    \end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}{From Continuous Geometry to Discrete Data}
+    \begin{itemize}
+        \item Laplacian Eigenmaps allow transferring ideas from differential geometry to data analysis:
+        \begin{itemize}
+            \item \textbf{Diffusion}: heat flow on a manifold $\leftrightarrow$ diffusion processes on graphs.
+            \item \textbf{Smoothness}: low-oscillation eigenfunctions $\leftrightarrow$ low-variation graph signals.
+            \item \textbf{Eigenmodes}: Laplace–Beltrami eigenfunctions $\leftrightarrow$ graph Laplacian eigenvectors.
+        \end{itemize}
+
+        \vspace{0.3cm}
+
+        \item This creates a unified framework connecting:
+        \begin{itemize}
+            \item PDEs and variational principles,
+            \item manifold geometry,
+            \item and machine learning on graphs.
+        \end{itemize}
+
+        \item The result: geometric structure of data becomes accessible even in discrete, high-dimensional settings.
+    \end{itemize}
+\end{frame}
+
+
+
+
+\end{document}
+ 
