@@ -1,10 +1,11 @@
-\documentclass[aspectratio=169]{beamer}
- 
+\documentclass[11pt]{beamer}
+
 % Configuración de idioma y codificación
 \usepackage[utf8]{inputenc}
-\usepackage[spanish]{babel}
+% \usepackage[spanish]{babel}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{graphicx}
  
 % Selección de tema (Madrid es clásico y tiene pies de página informativos)
 \usetheme{Madrid}
@@ -21,12 +22,12 @@
 \setbeamertemplate{footline}[frame number]
  
 \begin{document}
- 
+
 % --- DIAPOSITIVA 1: PORTADA ---
 \begin{frame}
     \titlepage
 \end{frame}
- 
+
 % --- DIAPOSITIVA 2: OBJETIVOS ---
 \begin{frame}{Why Laplacian Eigenmaps?}
     \begin{itemize}
@@ -48,9 +49,9 @@
         \item Assign similarity weights $w_{ij}$ between connected points.
         \item Construct the graph Laplacian: $L = D - A$.
         \item Solve the spectral problem:
-        \[
-            Lf = \lambda f.
-        \]
+              \[
+                  Lf = \lambda f.
+              \]
     \end{enumerate}
 
     \vspace{0.3cm}
@@ -130,12 +131,12 @@
 \begin{frame}{Laplacian Eigenmaps in Graph-Based Learning}
     \begin{itemize}
         \item Laplacian Eigenmaps provide the spectral foundation for many graph learning algorithms:
-        \begin{itemize}
-            \item \textbf{Spectral Clustering}: uses the smallest non-zero Laplacian eigenvectors to partition graphs.
-            \item \textbf{Graph Convolutional Networks (GCNs)}: graph convolutions are defined using the Laplacian spectrum.
-        \end{itemize}
+              \begin{itemize}
+                  \item \textbf{Spectral Clustering}: uses the smallest non-zero Laplacian eigenvectors to partition graphs.
+                  \item \textbf{Graph Convolutional Networks (GCNs)}: graph convolutions are defined using the Laplacian spectrum.
+              \end{itemize}
 
-        \vspace{0.3cm}
+              \vspace{0.3cm}
 
         \item The Laplacian encodes the local geometry of the dataset by capturing similarity relations through weights $w_{ij}$.
         \item Eigenvectors provide smooth representations that respect this geometry.
@@ -169,27 +170,66 @@
 \begin{frame}{From Continuous Geometry to Discrete Data}
     \begin{itemize}
         \item Laplacian Eigenmaps allow transferring ideas from differential geometry to data analysis:
-        \begin{itemize}
-            \item \textbf{Diffusion}: heat flow on a manifold $\leftrightarrow$ diffusion processes on graphs.
-            \item \textbf{Smoothness}: low-oscillation eigenfunctions $\leftrightarrow$ low-variation graph signals.
-            \item \textbf{Eigenmodes}: Laplace–Beltrami eigenfunctions $\leftrightarrow$ graph Laplacian eigenvectors.
-        \end{itemize}
+              \begin{itemize}
+                  \item \textbf{Diffusion}: heat flow on a manifold $\leftrightarrow$ diffusion processes on graphs.
+                  \item \textbf{Smoothness}: low-oscillation eigenfunctions $\leftrightarrow$ low-variation graph signals.
+                  \item \textbf{Eigenmodes}: Laplace–Beltrami eigenfunctions $\leftrightarrow$ graph Laplacian eigenvectors.
+              \end{itemize}
 
-        \vspace{0.3cm}
+              \vspace{0.3cm}
 
         \item This creates a unified framework connecting:
-        \begin{itemize}
-            \item PDEs and variational principles,
-            \item manifold geometry,
-            \item and machine learning on graphs.
-        \end{itemize}
+              \begin{itemize}
+                  \item PDEs and variational principles,
+                  \item manifold geometry,
+                  \item and machine learning on graphs.
+              \end{itemize}
 
         \item The result: geometric structure of data becomes accessible even in discrete, high-dimensional settings.
     \end{itemize}
 \end{frame}
 
+% SERGI
+\begin{frame}{Swiss Roll Dataset}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.95\textwidth]{./images/swiss_roll_3d.png}
+        \caption{3D Visualization of the Swiss Roll Dataset}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Laplacian Eigenmaps Embedding of Swiss Roll}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.7\textwidth]{./images/le_swiss_roll_k15_s2.0.png}
+        \caption{2D Embedding of the Swiss Roll Dataset using Laplacian Eigenmaps}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Effect of Neighbors (k) on Embedding}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.66\textwidth]{./images/le_swiss_roll_neighbours.png}
+        \caption{Effect of Varying Number of Neighbors (k) on the Embedding}
+    \end{figure}
+\end{frame}
 
 
+\begin{frame}{Effect of Sigma (Kernel Bandwidth) on Embedding}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.66\textwidth]{./images/le_swiss_roll_sigmas.png}
+        \caption{Effect of Varying Sigma (Kernel Bandwidth) on the Embedding}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{PCA vs Laplacian Eigenmaps on Swiss Roll}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\textwidth]{./images/pca_vs_le.png}
+        \caption{Comparison of PCA and Laplacian Eigenmaps on the Swiss Roll Dataset}
+    \end{figure}
+\end{frame}
 
 \end{document}
- 
+
