@@ -6,9 +6,9 @@ from typing import Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from scipy.spatial.distance import cdist
 from sklearn.datasets import make_swiss_roll
-import pandas as pd
 
 
 def create_swiss_roll(
@@ -240,7 +240,7 @@ def load_mammoth_data():
     Returns a numpy array of shape (n_samples, 3).
     """
     print("Loading Mammoth 3D dataset...")
-    df = pd.read_csv("data/mammoth_a.csv",  dtype=np.float32, header=None, sep=',')
+    df = pd.read_csv("../data/mammoth_a.csv", dtype=np.float32, header=None, sep=",")
     data = df.to_numpy()
     print(f"Data shape: {data.shape}")
     return data
