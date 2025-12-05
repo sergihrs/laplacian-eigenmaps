@@ -28,52 +28,139 @@
     \titlepage
 \end{frame}
 
-% --- DIAPOSITIVA 2: OBJETIVOS ---
-\begin{frame}{Why Laplacian Eigenmaps?}
-    \begin{itemize}
-        \item Classical dimensionality reduction techniques (PCA, MDS) are \textbf{linear} and fail to capture non-linear structures.
-        \item Real datasets often lie near a \textbf{non-linear manifold} embedded in high dimensions.
-        \item \textbf{Laplacian Eigenmaps} aim to preserve the \textbf{local geometry} of the data.
-    \end{itemize}
-
-    \vspace{0.3cm}
-    \begin{block}{Key Idea}
-        Build a graph that captures local relationships and use the eigenvectors of the \textbf{graph Laplacian} to obtain a smooth low-dimensional embedding.
+% --- DIAPOSITIVA 2: Introducción (Modificada para dar contexto) ---
+\begin{frame}{Laplacian Eigenmaps: The Core Intuition}
+    \begin{block}{Goal}
+        Map high-dimensional data $x_1, \dots, x_N \in \mathbb{R}^D$ to low-dimensional points $\mathbf{y}_1, \dots, \mathbf{y}_N \in \mathbb{R}^m$ (where $m \ll D$) while preserving \textbf{local neighborhood information}.
     \end{block}
+
+    \vspace{0.5cm}
+    \textbf{The Fundamental Idea:}
+    \begin{itemize}
+        \item If two points $x_i$ and $x_j$ are close in the original space (high similarity), they should be mapped close together in the new space.
+        \item We treat this as an optimization problem minimizing the stretching of edges in the neighborhood graph.
+    \end{itemize}
 \end{frame}
 
-
-\begin{frame}{Laplacian Eigenmaps: Core Idea}
+% --- DIAPOSITIVA 3: Construcción del Grafo (Detallado W y D) ---
+\begin{frame}{Step 1: Graph Construction \& Weights}
+    First, we define the geometry of the data manifold.
+    
     \begin{enumerate}
-        \item Build a \textbf{neighborhood graph} using k-NN or a kernel.
-        \item Assign similarity weights $w_{ij}$ between connected points.
-        \item Construct the graph Laplacian: $L = D - A$.
-        \item Solve the spectral problem:
-              \[
-                  Lf = \lambda f.
-              \]
+        \item \textbf{Adjacency (Neighbors):} Use $k$-Nearest Neighbors (k-NN). To ensure the graph is undirected, we enforce symmetry:
+        \[
+           \text{Connect } i \text{ and } j \text{ if } i \in kNN(j) \textbf{ OR } j \in kNN(i).
+        \]
+        \item \textbf{Weights ($W$):} Assign weights $W_{ij}$ (Heat Kernel):
+        \[
+            W_{ij} = e^{-\frac{||x_i - x_j||^2}{t}} \quad \text{if connected, else } 0.
+        \]
+        \item \textbf{Symmetrization:} Ensure $W$ is symmetric ($W_{ij} = W_{ji}$) so eigenvalues are real.
+        \item \textbf{Degree Matrix ($D$):} Diagonal matrix measuring density.
+        \[
+            D_{ii} = \sum_{j} W_{ij}
+        \]
     \end{enumerate}
-
-    \vspace{0.3cm}
-    \begin{block}{Final Embedding}
-        The eigenvectors associated with the smallest non-zero eigenvalues provide the embedding coordinates.
-    \end{block}
 \end{frame}
 
+% --- DIAPOSITIVA 4: El Problema en 1 Dimensión (Función de Coste) ---
+\begin{frame}{Step 2: The Optimization Problem (1D Case)}
+    Let's try to map the data to a \textbf{single line} ($m=1$).
+    Let $\mathbf{y} = (y_1, y_2, \dots, y_N)^T$ be the coordinate vector.
 
-\begin{frame}{Geometric Interpretation}
+    We want to minimize the weighted distance between neighbors:
+    
+    \begin{block}{Objective Function}
+        \[
+            \min_{\mathbf{y}} \sum_{i,j} (y_i - y_j)^2 W_{ij}
+        \]
+    \end{block}
+
     \begin{itemize}
-        \item The graph Laplacian measures the \textbf{smoothness} of a function on the graph.
-        \item Minimizing $f^\top L f = \sum_{i,j} w_{ij}(f_i - f_j)^2$ encourages nearby nodes to have similar values.
-        \item The smallest-energy eigenvectors correspond to the "smoothest" functions on the graph.
+        \item If $W_{ij}$ is large (points are close), $y_i$ and $y_j$ \textbf{must} be close to minimize the cost.
+        \item If $W_{ij} = 0$, the distance $(y_i - y_j)$ doesn't matter.
     \end{itemize}
+\end{frame}
 
-    \vspace{0.3cm}
-    \begin{alertblock}{Why this reduces dimension}
-        These smooth eigenfunctions capture the local geometric structure of the underlying manifold.
+% --- DIAPOSITIVA 5: De Sumatorio a Matrices (El Truco Algebraico) ---
+\begin{frame}{Step 3: From Summation to Matrix Form}
+    We can rewrite the sum using algebraic manipulation:
+    
+    \begin{align*}
+        \sum_{i,j} (y_i - y_j)^2 W_{ij} &= \sum_{i,j} (y_i^2 + y_j^2 - 2y_i y_j) W_{ij} \\
+        &= \sum_{i} y_i^2 D_{ii} + \sum_{j} y_j^2 D_{jj} - 2\sum_{i,j} y_i y_j W_{ij} \\
+        &= 2\mathbf{y}^T D \mathbf{y} - 2\mathbf{y}^T W \mathbf{y} \\
+        &= 2\mathbf{y}^T (D - W) \mathbf{y}
+    \end{align*}
+
+    \begin{alertblock}{The Graph Laplacian}
+        Defining $L = D - W$, the objective function becomes:
+        \[
+            \text{Cost}(\mathbf{y}) = 2 \mathbf{y}^T L \mathbf{y}
+        \]
     \end{alertblock}
 \end{frame}
 
+% --- DIAPOSITIVA 6: Restricciones y Lagrange ---
+\begin{frame}{Step 4: Constraints and Lagrange Multipliers}
+    To prevent the trivial solution ($\mathbf{y}=\mathbf{0}$, cost=0), we impose a constraint to fix the scale and handle density:
+    \[
+        \mathbf{y}^T D \mathbf{y} = 1
+    \]
+    
+    Now we solve using \textbf{Lagrange Multipliers}:
+    \[
+        \mathcal{L}(\mathbf{y}, \lambda) = \mathbf{y}^T L \mathbf{y} - \lambda (\mathbf{y}^T D \mathbf{y} - 1)
+    \]
+    Taking the derivative with respect to $\mathbf{y}$ and setting to 0:
+    \[
+        2 L \mathbf{y} - 2 \lambda D \mathbf{y} = 0 \implies \boxed{L \mathbf{y} = \lambda D \mathbf{y}}
+    \]
+    
+    This is the \textbf{Generalized Eigenvalue Problem}.
+\end{frame}
+
+% --- DIAPOSITIVA 7: Selección de Autovalores (Por qué los mínimos) ---
+\begin{frame}{Step 5: Why Smallest Eigenvalues?}
+    We have found that the optimal $\mathbf{y}$ must be an eigenvector. But which one?
+    Let's check the cost of a specific eigenvector solution $\mathbf{y}$:
+    
+    \[
+        \text{Cost} = \mathbf{y}^T L \mathbf{y}
+    \]
+    Since $L \mathbf{y} = \lambda D \mathbf{y}$, we substitute:
+    \[
+        \mathbf{y}^T L \mathbf{y} = \mathbf{y}^T (\lambda D \mathbf{y}) = \lambda (\mathbf{y}^T D \mathbf{y})
+    \]
+    Using our constraint $\mathbf{y}^T D \mathbf{y} = 1$:
+    \[
+        \text{Cost} = \lambda
+    \]
+    
+    \begin{block}{Conclusion}
+        To \textbf{minimize the cost}, we must choose the eigenvectors with the \textbf{smallest eigenvalues} $\lambda$.
+    \end{block}
+\end{frame}
+
+% --- DIAPOSITIVA 8: Generalización y Algoritmo Final ---
+\begin{frame}{Step 6: Generalizing to $m$ Dimensions}
+    \begin{itemize}
+        \item $\lambda_0 = 0$: Corresponds to eigenvector $\mathbf{1}$ (constant vector). Maps all points to a single spot. \textbf{Discard it.}
+        \item $\lambda_1, \dots, \lambda_m$: The smallest non-zero eigenvalues.
+    \end{itemize}
+
+    \vspace{0.3cm}
+    \textbf{The Embedding Map:}
+    For embedding into $m$ dimensions, we use the eigenvectors $\mathbf{f}_1, \dots, \mathbf{f}_m$ associated with $0 < \lambda_1 \le \dots \le \lambda_m$.
+    
+    \[
+        x_i \mapsto \left( \mathbf{f}_1(i), \mathbf{f}_2(i), \dots, \mathbf{f}_m(i) \right)
+    \]
+
+    \begin{block}{Summary}
+        The coordinates in the low-dimensional space are literally the values of the Laplacian eigenvectors.
+    \end{block}
+\end{frame}
 
 
 \begin{frame}{The Continuous Problem: Laplace–Beltrami}
