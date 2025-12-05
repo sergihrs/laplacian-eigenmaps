@@ -155,35 +155,64 @@
 \end{frame}
 
 % MAZUECOS
-\begin{frame}{From Continuous to Discrete: The Key Connection}
+\begin{frame}{Laplace–Beltrami: From Continuous to Discrete}
+
+    \vspace{0.3cm}
+
     \begin{columns}[t]
+        % --- LEFT COLUMN: CONTINUOUS ---
         \begin{column}{0.48\textwidth}
-            \textbf{Continuous Laplacian}
+            \centering
+            \textbf{\textcolor{blue}{Continuous Manifold}}
+
+            \vspace{0.2cm}
+            \emph{Minimize Gradient Energy}
+            \[
+                \min_{\|u\|=1} \int_\Omega \|\nabla u\|^2 \, dx
+            \]
+            \vspace{0.1cm}
+            $\downarrow$ \small{leads to}
+            \vspace{0.1cm}
+
+            \textbf{Laplace-Beltrami Operator}
             \[
                 -\Delta u = \lambda u
             \]
-            \[
-                \int |\nabla u|^2
-            \]
         \end{column}
+
+        % --- VERTICAL SEPARATOR (Optional visual aid) ---
+        \vrule{}
+
+        % --- RIGHT COLUMN: DISCRETE ---
         \begin{column}{0.48\textwidth}
+            \centering
+            \textbf{\textcolor{blue}{Discrete Graph}}
+
+            \vspace{0.2cm}
+            \emph{Minimize Edge Tension}
+            \[
+                \min_{\mathbf{f}^T D \mathbf{f}=1} \sum_{i,j} W_{ij}(f_i - f_j)^2
+            \]
+            \vspace{0.1cm}
+            $\downarrow$ \small{leads to}
+            \vspace{0.1cm}
+
             \textbf{Graph Laplacian}
             \[
-                Lf = \lambda f
-            \]
-            \[
-                f^\top L f = \sum w_{ij}(f_i - f_j)^2
+                L \mathbf{f} = \lambda D \mathbf{f}
             \]
         \end{column}
     \end{columns}
 
-    \vspace{0.4cm}
-    \begin{block}{Conceptual Correspondence}
-        \begin{itemize}
-            \item $|\nabla u|^2 \;\longleftrightarrow\; (f_i - f_j)^2$
-            \item Laplace–Beltrami operator $\longleftrightarrow$ Graph Laplacian
-            \item Smoothness on the manifold $\longleftrightarrow$ Smoothness on the graph
-        \end{itemize}
+    \vspace{0.5cm}
+
+    \begin{block}{The Correspondence}
+        \centering
+        \begin{tabular}{r c l}
+            Local Variation $(\nabla u)^2$ & $\longleftrightarrow$ & Edge Difference $(f_i - f_j)^2$ \\
+            Laplace Operator $-\Delta$     & $\longleftrightarrow$ & Graph Matrix $L = D-W$          \\
+            Manifold Harmonics             & $\longleftrightarrow$ & Graph Eigenvectors              \\
+        \end{tabular}
     \end{block}
 \end{frame}
 
