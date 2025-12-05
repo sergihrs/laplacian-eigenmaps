@@ -12,8 +12,8 @@
 \usecolortheme{default} % Puedes cambiar 'beaver' por 'default', 'dolphin', etc.
  
 % Metadatos del documento
-\title[Proyecto 7: Laplacian Eigenmaps]{Proyecto 7: Laplacian Eigenmaps para reducción de dimensión y embeddings}
-\subtitle{Asignatura: Métodos Diferenciales para la IA}
+\title[Proyecto 7: Laplacian Eigenmaps]{Laplacian Eigenmaps for Dimensionality Reduction}
+\subtitle{Differential Methods for AI}
 \author[Máster IA]{Sergio Herreros Pérez, Mario Kroll Merino, Carlos Mazuecos Reíllo, José Andrés Ridruejo Tuñón}
 \date{} % Dejar vacío o poner \today
  
@@ -23,12 +23,11 @@
  
 \begin{document}
 
-% --- DIAPOSITIVA 1: PORTADA ---
+% PEPE
 \begin{frame}
     \titlepage
 \end{frame}
 
-% --- DIAPOSITIVA 2: Introducción (Modificada para dar contexto) ---
 \begin{frame}{Laplacian Eigenmaps: The Core Intuition}
     \begin{block}{Goal}
         Map high-dimensional data $x_1, \dots, x_N \in \mathbb{R}^D$ to low-dimensional points $\mathbf{y}_1, \dots, \mathbf{y}_N \in \mathbb{R}^m$ (where $m \ll D$) while preserving \textbf{local neighborhood information}.
@@ -42,34 +41,31 @@
     \end{itemize}
 \end{frame}
 
-% --- DIAPOSITIVA 3: Construcción del Grafo (Detallado W y D) ---
 \begin{frame}{Step 1: Graph Construction \& Weights}
     First, we define the geometry of the data manifold.
-    
+
     \begin{enumerate}
         \item \textbf{Adjacency (Neighbors):} Use $k$-Nearest Neighbors (k-NN). To ensure the graph is undirected, we enforce symmetry:
-        \[
-           \text{Connect } i \text{ and } j \text{ if } i \in kNN(j) \textbf{ OR } j \in kNN(i).
-        \]
+              \[
+                  \text{Connect } i \text{ and } j \text{ if } i \in kNN(j) \textbf{ OR } j \in kNN(i).
+              \]
         \item \textbf{Weights ($W$):} Assign weights $W_{ij}$ (Heat Kernel):
-        \[
-            W_{ij} = e^{-\frac{||x_i - x_j||^2}{t}} \quad \text{if connected, else } 0.
-        \]
-        \item \textbf{Symmetrization:} Ensure $W$ is symmetric ($W_{ij} = W_{ji}$) so eigenvalues are real.
+              \[
+                  W_{ij} = e^{-\frac{||x_i - x_j||^2}{t}} \quad \text{if connected, else } 0.
+              \]
         \item \textbf{Degree Matrix ($D$):} Diagonal matrix measuring density.
-        \[
-            D_{ii} = \sum_{j} W_{ij}
-        \]
+              \[
+                  D_{ii} = \sum_{j} W_{ij}
+              \]
     \end{enumerate}
 \end{frame}
 
-% --- DIAPOSITIVA 4: El Problema en 1 Dimensión (Función de Coste) ---
 \begin{frame}{Step 2: The Optimization Problem (1D Case)}
     Let's try to map the data to a \textbf{single line} ($m=1$).
     Let $\mathbf{y} = (y_1, y_2, \dots, y_N)^T$ be the coordinate vector.
 
     We want to minimize the weighted distance between neighbors:
-    
+
     \begin{block}{Objective Function}
         \[
             \min_{\mathbf{y}} \sum_{i,j} (y_i - y_j)^2 W_{ij}
@@ -82,32 +78,30 @@
     \end{itemize}
 \end{frame}
 
-% --- DIAPOSITIVA 5: De Sumatorio a Matrices (El Truco Algebraico) ---
 \begin{frame}{Step 3: From Summation to Matrix Form}
     We can rewrite the sum using algebraic manipulation:
-    
+
     \begin{align*}
-        \sum_{i,j} (y_i - y_j)^2 W_{ij} &= \sum_{i,j} (y_i^2 + y_j^2 - 2y_i y_j) W_{ij} \\
-        &= \sum_{i} y_i^2 D_{ii} + \sum_{j} y_j^2 D_{jj} - 2\sum_{i,j} y_i y_j W_{ij} \\
-        &= 2\mathbf{y}^T D \mathbf{y} - 2\mathbf{y}^T W \mathbf{y} \\
-        &= 2\mathbf{y}^T (D - W) \mathbf{y}
+        \sum_{i,j} (y_i - y_j)^2 W_{ij} & = \sum_{i,j} (y_i^2 + y_j^2 - 2y_i y_j) W_{ij}                               \\
+                                        & = \sum_{i} y_i^2 D_{ii} + \sum_{j} y_j^2 D_{jj} - 2\sum_{i,j} y_i y_j W_{ij} \\
+                                        & = 2\mathbf{y}^T D \mathbf{y} - 2\mathbf{y}^T W \mathbf{y}                    \\
+                                        & = 2\mathbf{y}^T (D - W) \mathbf{y}
     \end{align*}
 
     \begin{alertblock}{The Graph Laplacian}
-        Defining $L = D - W$, the objective function becomes:
+        Since $L = D - W$, the objective function becomes:
         \[
             \text{Cost}(\mathbf{y}) = 2 \mathbf{y}^T L \mathbf{y}
         \]
     \end{alertblock}
 \end{frame}
 
-% --- DIAPOSITIVA 6: Restricciones y Lagrange ---
 \begin{frame}{Step 4: Constraints and Lagrange Multipliers}
-    To prevent the trivial solution ($\mathbf{y}=\mathbf{0}$, cost=0), we impose a constraint to fix the scale and handle density:
+    To prevent all points from collapsing to a single point, we impose a constraint to fix the scale and handle density:
     \[
         \mathbf{y}^T D \mathbf{y} = 1
     \]
-    
+
     Now we solve using \textbf{Lagrange Multipliers}:
     \[
         \mathcal{L}(\mathbf{y}, \lambda) = \mathbf{y}^T L \mathbf{y} - \lambda (\mathbf{y}^T D \mathbf{y} - 1)
@@ -116,15 +110,14 @@
     \[
         2 L \mathbf{y} - 2 \lambda D \mathbf{y} = 0 \implies \boxed{L \mathbf{y} = \lambda D \mathbf{y}}
     \]
-    
+
     This is the \textbf{Generalized Eigenvalue Problem}.
 \end{frame}
 
-% --- DIAPOSITIVA 7: Selección de Autovalores (Por qué los mínimos) ---
 \begin{frame}{Step 5: Why Smallest Eigenvalues?}
     We have found that the optimal $\mathbf{y}$ must be an eigenvector. But which one?
     Let's check the cost of a specific eigenvector solution $\mathbf{y}$:
-    
+
     \[
         \text{Cost} = \mathbf{y}^T L \mathbf{y}
     \]
@@ -136,13 +129,12 @@
     \[
         \text{Cost} = \lambda
     \]
-    
+
     \begin{block}{Conclusion}
         To \textbf{minimize the cost}, we must choose the eigenvectors with the \textbf{smallest eigenvalues} $\lambda$.
     \end{block}
 \end{frame}
 
-% --- DIAPOSITIVA 8: Generalización y Algoritmo Final ---
 \begin{frame}{Step 6: Generalizing to $m$ Dimensions}
     \begin{itemize}
         \item $\lambda_0 = 0$: Corresponds to eigenvector $\mathbf{1}$ (constant vector). Maps all points to a single spot. \textbf{Discard it.}
@@ -152,7 +144,7 @@
     \vspace{0.3cm}
     \textbf{The Embedding Map:}
     For embedding into $m$ dimensions, we use the eigenvectors $\mathbf{f}_1, \dots, \mathbf{f}_m$ associated with $0 < \lambda_1 \le \dots \le \lambda_m$.
-    
+
     \[
         x_i \mapsto \left( \mathbf{f}_1(i), \mathbf{f}_2(i), \dots, \mathbf{f}_m(i) \right)
     \]
@@ -162,6 +154,7 @@
     \end{block}
 \end{frame}
 
+% MAZUECOS
 \begin{frame}{From Continuous to Discrete: The Key Connection}
     \begin{columns}[t]
         \begin{column}{0.48\textwidth}
@@ -193,7 +186,6 @@
         \end{itemize}
     \end{block}
 \end{frame}
-
 
 \begin{frame}{Laplacian Eigenmaps in Graph-Based Learning}
     \begin{itemize}
@@ -227,7 +219,6 @@
         \item This provides a rigorous bridge between PDE-based models and graph learning.
     \end{itemize}
 \end{frame}
-
 
 \begin{frame}{From Continuous Geometry to Discrete Data}
     \begin{itemize}
@@ -277,7 +268,6 @@
     \end{figure}
 \end{frame}
 
-
 \begin{frame}{Effect of Sigma (Kernel Bandwidth) on Embedding}
     \begin{figure}
         \centering
@@ -294,6 +284,7 @@
     \end{figure}
 \end{frame}
 
+% MARIO
 \begin{frame}{Mammoth Dataset}
     \begin{figure}
         \centering
