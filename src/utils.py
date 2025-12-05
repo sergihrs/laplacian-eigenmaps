@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.distance import cdist
 from sklearn.datasets import make_swiss_roll
+import pandas as pd
 
 
 def create_swiss_roll(
@@ -231,3 +232,15 @@ def plot_comparison(
     plt.tight_layout()
 
     return fig, np.array(axes)
+
+
+def load_mammoth_data():
+    """
+    Loads the Mammoth 3D dataset (mammoth_a.csv).
+    Returns a numpy array of shape (n_samples, 3).
+    """
+    print("Loading Mammoth 3D dataset...")
+    df = pd.read_csv("data/mammoth_a.csv",  dtype=np.float32, header=None, sep=',')
+    data = df.to_numpy()
+    print(f"Data shape: {data.shape}")
+    return data
